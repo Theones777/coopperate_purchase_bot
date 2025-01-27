@@ -12,6 +12,7 @@ common_router = Router()
 async def message_start_handler(msg: Message):
     user_id: int = msg.from_user.id
     admin_ids = await get_admin_ids()
+    await UserStorage.save_new_user(user_id)
 
     if user_id in admin_ids:
         await msg.answer(
@@ -23,7 +24,6 @@ async def message_start_handler(msg: Message):
             "/message_mailing - Отправка всем сообщения"
         )
     else:
-        await UserStorage.save_new_user(user_id)
         await msg.answer(
             "Привет! Я бот для проведения совместной закупки из <b>Bhajan Cafe</b>. "
             "При проведении новой закупки я отправлю Вам сообщение"
