@@ -7,4 +7,4 @@ load_dotenv()
 
 class Config:
     BOT_TOKEN = getenv("BOT_TOKEN")
-    ADMINS_IDS = getenv("ADMINS_IDS")
+    ADMIN_IDS = getenv("ADMIN_IDS")
