@@ -1,9 +1,12 @@
-from aiogram import Router
+from aiogram import Router, Bot
 from aiogram.filters import Command
 from aiogram.types import Message
 
+from bot.Clients.user_storage import UserStorage
+from bot.middlewares.check_access import CheckAccessMiddleware
 
 admin_router = Router()
+admin_router.message.middleware(CheckAccessMiddleware())
 
 
 @admin_router.message(Command("start_custom"))
@@ -26,6 +29,11 @@ async def ready_custom_handler(msg: Message):
 
 
 @admin_router.message(Command("message_mailing"))
-async def message_mailing_handler(msg: Message):
+async def message_mailing_handler(msg: Message, bot: Bot):
     # todo message_mailing
-    await msg.answer("Заглушка - Рассылка всем")
+    for i in await UserStorage.get_users_list():
+        try:
+            await bot.send_message(chat_id=i,
+                                   text='Это рассылка')
+        except:
+            pass
