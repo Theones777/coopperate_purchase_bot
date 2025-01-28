@@ -50,8 +50,8 @@ async def mailing_message_inserted(msg: Message, state: FSMContext):
     F.text.in_(gs_client.get_custom_names_in_work())
 )
 async def custom_type_chosen(msg: Message, state: FSMContext):
-    chosen_custom_type = msg.text.lower()
-    await state.update_data(custom_type=chosen_custom_type)
+    custom_type = msg.text.lower()
+    await state.update_data(custom_type=custom_type)
     await msg.answer(text="Теперь, пожалуйста, введите сообщение для отправки")
     await state.set_state(Mailing.mailing_message)
 

@@ -1,8 +1,7 @@
 from enum import Enum
 
 from aiogram import Bot
-from aiogram.types import BotCommand, BotCommandScopeDefault, BotCommandScopeChatAdministrators, ReplyKeyboardMarkup, \
-    KeyboardButton
+from aiogram.types import BotCommand, BotCommandScopeDefault, ReplyKeyboardMarkup, KeyboardButton
 
 from bot.Clients.user_storage import UserStorage
 from config import Config

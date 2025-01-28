@@ -15,3 +15,9 @@ START_USER = (
 
 HELP_MESSAGE = "Номер для связи - +7 123 456789 Шурик"
 
+READY_MESSAGE = "Добрый день) Заказ по закупке {custom_type} готов к выдаче"
+
+DELAY_MESSAGE = (
+    "Добрый день) Приносим свои извинения, поставка {custom_type} задерживается.\n"
+    "Ожидаем {expected_date}"
+)

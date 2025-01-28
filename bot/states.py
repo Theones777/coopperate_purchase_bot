@@ -6,3 +6,14 @@ class Mailing(StatesGroup):
     custom_type = State()
     mailing_message = State()
     confirm = State()
+
+
+class Ready(StatesGroup):
+    custom_type = State()
+    confirm = State()
+
+
+class Delay(StatesGroup):
+    custom_type = State()
+    expected_date = State()
+    confirm = State()
