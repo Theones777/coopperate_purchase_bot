@@ -62,7 +62,6 @@ async def custom_type_chosen(msg: Message, state: FSMContext):
 
 @admin_router.message(StateFilter(None), Command("delay_custom"))
 async def delay_custom_handler(msg: Message, state: FSMContext):
-    # todo кнопки активных закупок - ожидаемая дата поставки - рассылка тем, кто заказал
     await msg.answer(
         text="Выберите вид закупки:",
         reply_markup=make_keyboard(gs_client.get_custom_names_in_work())
