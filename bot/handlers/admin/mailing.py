@@ -1,0 +1,83 @@
+from aiogram import F, Bot
+from aiogram.filters import StateFilter, Command
+from aiogram.fsm.context import FSMContext
+from aiogram.types import Message, ReplyKeyboardRemove
+
+from bot.Clients.GS import gs_client
+from bot.handlers.admin.init_handler import admin_router
+from bot.states import Mailing
+from bot.utils import make_keyboard, mailing, MailingTypes, ConfirmButtons
+
+
+@admin_router.message(
+    Mailing.confirm,
+    F.text.in_([el.value for el in ConfirmButtons])
+)
+async def confirm(msg: Message, state: FSMContext, bot: Bot):
+    user_data = await state.get_data()
+    mailing_type = user_data.get("mailing_type")
+    custom_type = user_data.get("custom_type")
+    mailing_message = user_data.get("mailing_message")
+
+    await mailing(bot, mailing_type, custom_type, mailing_message)
+
+    await msg.answer(text=f"Рассылка завершена", reply_markup=ReplyKeyboardRemove())
+    await state.clear()
+
+
+@admin_router.message(
+    Mailing.mailing_message
+)
+async def mailing_message_inserted(msg: Message, state: FSMContext):
+    mailing_message = msg.text.lower()
+    user_data = await state.get_data()
+    mailing_type = user_data.get("mailing_type")
+    custom_type = user_data.get("custom_type")
+
+    await state.update_data(mailing_message=mailing_message)
+    await msg.answer(
+        text=f"Вы уверены, что хотите отправить данное сообщение?\n"
+             f"Тип рассылки - {mailing_type}\n"
+             f"Закупка - {custom_type}\n"
+             f"Сообщение - {mailing_message}",
+        reply_markup=make_keyboard([el.value for el in ConfirmButtons])
+    )
+    await state.set_state(Mailing.confirm)
+
+
+@admin_router.message(
+    Mailing.custom_type,
+    F.text.in_(gs_client.get_custom_names_in_work())
+)
+async def custom_type_chosen(msg: Message, state: FSMContext):
+    chosen_custom_type = msg.text.lower()
+    await state.update_data(custom_type=chosen_custom_type)
+    await msg.answer(text="Теперь, пожалуйста, введите сообщение для отправки")
+    await state.set_state(Mailing.mailing_message)
+
+
+@admin_router.message(
+    Mailing.mailing_type,
+    F.text.in_([el.value for el in MailingTypes])
+)
+async def mailing_type_chosen(msg: Message, state: FSMContext):
+    chosen_mailing_type = msg.text.lower()
+    await state.update_data(mailing_type=chosen_mailing_type)
+    if chosen_mailing_type == "заказавшим":
+        await msg.answer(
+            text="Теперь, пожалуйста, выберите вид закупки:",
+            reply_markup=make_keyboard(gs_client.get_custom_names_in_work())
+        )
+        await state.set_state(Mailing.custom_type)
+    else:
+        await msg.answer(text="Теперь, пожалуйста, введите сообщение для отправки")
+        await state.set_state(Mailing.mailing_message)
+
+
+@admin_router.message(StateFilter(None), Command("message_mailing"))
+async def message_mailing_handler(msg: Message, state: FSMContext):
+    await msg.answer(
+        text="Выберите тип рассылки:",
+        reply_markup=make_keyboard([el.value for el in MailingTypes])
+    )
+    await state.set_state(Mailing.mailing_type)

@@ -1,38 +1,33 @@
 from aiogram import Router
-from aiogram.filters import Command
-from aiogram.types import Message
+from aiogram.filters import Command, StateFilter
+from aiogram.fsm.context import FSMContext
+from aiogram.types import Message, ReplyKeyboardRemove
 
 from bot.Clients.user_storage import UserStorage
+from bot.texts import START_ADMIN, START_USER, HELP_MESSAGE
 from bot.utils import get_admin_ids
 
 common_router = Router()
 
 
-@common_router.message(Command("start"))
-async def message_start_handler(msg: Message):
+@common_router.message(StateFilter(None), Command(commands=["start"]))
+async def message_start_handler(msg: Message, state: FSMContext):
+    await state.clear()
+
     user_id: int = msg.from_user.id
     admin_ids = await get_admin_ids()
     await UserStorage.save_new_user(user_id)
 
     if user_id in admin_ids:
-        await msg.answer(
-            "Привет! У Вас есть права администратора!\n"
-            "Команды, доступные администратору:\n "
-            "/start_custom - Начать закупку,\n "
-            "/delay_custom - Заказ задерживается,\n "
-            "/ready_custom - Заказ готова к выдаче,\n "
-            "/message_mailing - Отправка всем сообщения"
-        )
+        message = START_ADMIN
     else:
-        await msg.answer(
-            "Привет! Я бот для проведения совместной закупки из <b>Bhajan Cafe</b>. "
-            "При проведении новой закупки я отправлю Вам сообщение"
-        )
+        message = START_USER
+    await msg.answer(message, reply_markup=ReplyKeyboardRemove())
 
 
 @common_router.message(Command("help"))
 async def message_help_handler(msg: Message):
-    await msg.answer("Номер для связи - +7 123 456789 Шурик")   # Todo help message
+    await msg.answer(HELP_MESSAGE)
 
 
 @common_router.message(Command("test"))

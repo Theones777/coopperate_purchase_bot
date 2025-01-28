@@ -4,7 +4,7 @@ from config import Config
 class UserStorage:
 
     @staticmethod
-    async def get_users_list() -> list:
+    async def get_all_users_list() -> list:
         try:
             with open(Config.USERS_FILE, 'r') as f:
                 return f.readlines()
@@ -15,7 +15,11 @@ class UserStorage:
 
     @staticmethod
     async def save_new_user(user_id: int):
-        users_list = await UserStorage.get_users_list()
+        users_list = await UserStorage.get_all_users_list()
         if str(user_id) + '\n' not in users_list:
             with open(Config.USERS_FILE, 'a') as f:
                 f.write(str(user_id) + '\n')
+
+    @staticmethod
+    async def get_custom_users_list(custom_type: str) -> list:
+        pass

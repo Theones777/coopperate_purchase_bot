@@ -5,7 +5,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from bot.handlers.admin import admin_router
+from bot.handlers.admin.init_handler import admin_router
 from bot.handlers.user import user_router
 from bot.handlers.common import common_router
 from bot.log import logger
