@@ -17,3 +17,9 @@ class Delay(StatesGroup):
     custom_type = State()
     expected_date = State()
     confirm = State()
+
+
+class Start(StatesGroup):
+    custom_type = State()
+    expected_date = State()
+    confirm = State()
