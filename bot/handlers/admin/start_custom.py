@@ -18,8 +18,11 @@ async def confirm(msg: Message, state: FSMContext, bot: Bot):
     custom_type = user_data.get("custom_type")
     mailing_message = user_data.get("mailing_message")
     mailing_type = MailingTypes.massive.value
+    buttons = []
+    for custom_type in gs_client.get_custom_names_in_work():
+        buttons.append(f"Сделать заказ {custom_type}")
 
-    await mailing(bot, mailing_type, custom_type, mailing_message)
+    await mailing(bot, mailing_type, custom_type, mailing_message, buttons)
     await msg.answer(text=f"Рассылка завершена", reply_markup=ReplyKeyboardRemove())
     await state.clear()
 
