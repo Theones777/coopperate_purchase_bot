@@ -22,4 +22,5 @@ class UserStorage:
 
     @staticmethod
     async def get_custom_users_list(custom_type: str) -> list:
-        pass
+        with open(Config.USERS_FILE, 'r') as f:
+            return f.readlines()

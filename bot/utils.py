@@ -3,7 +3,7 @@ from enum import Enum
 from aiogram import Bot
 from aiogram.types import BotCommand, BotCommandScopeDefault, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 
-from bot.Clients.user_storage import UserStorage
+from bot.clients.user_storage import UserStorage
 from config import Config
 
 
@@ -36,10 +36,10 @@ async def make_keyboard(items: list[str]) -> ReplyKeyboardMarkup:
 
 async def mailing(bot: Bot, mailing_type: str, custom_type: str, mailing_message: str, buttons: list = None):
     if mailing_type == MailingTypes.massive.value:
-        mailing_list = UserStorage.get_all_users_list()
+        mailing_list = await UserStorage.get_all_users_list()
     else:
-        mailing_list = UserStorage.get_custom_users_list(custom_type)
-    for i in await mailing_list:
+        mailing_list = await UserStorage.get_custom_users_list(custom_type)
+    for i in mailing_list:
         try:
             if buttons:
                 await bot.send_message(

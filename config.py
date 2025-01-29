@@ -11,4 +11,4 @@ class Config:
     GS_CONFIG = getenv("GS_CONFIG")
     GS_SHEET_NAME = getenv("GS_SHEET_NAME")
     USERS_FILE = "users.txt"
-    CUSTOM_PRICE_WORKSHEET_PREFIX = "Прайс"
+    CUSTOM_PRICE_WORKSHEET_PREFIX = "прайс"

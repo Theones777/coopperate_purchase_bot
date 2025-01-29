@@ -1,15 +1,16 @@
-from aiogram import F, Bot
+from aiogram import F, Bot, Router
 from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 
 from bot.clients.customs import gs_client
-from bot.handlers.admin.init_handler import admin_router
 from bot.states import Mailing
 from bot.utils import make_keyboard, mailing, MailingTypes, ConfirmButtons
 
+mailing_router = Router()
 
-@admin_router.message(
+
+@mailing_router.message(
     Mailing.confirm,
     F.text.in_([el.value for el in ConfirmButtons])
 )
@@ -25,9 +26,7 @@ async def confirm(msg: Message, state: FSMContext, bot: Bot):
     await state.clear()
 
 
-@admin_router.message(
-    Mailing.mailing_message
-)
+@mailing_router.message(Mailing.mailing_message)
 async def mailing_message_inserted(msg: Message, state: FSMContext):
     mailing_message = msg.text.lower()
     user_data = await state.get_data()
@@ -45,9 +44,7 @@ async def mailing_message_inserted(msg: Message, state: FSMContext):
     await state.set_state(Mailing.confirm)
 
 
-@admin_router.message(
-    Mailing.custom_type
-)
+@mailing_router.message(Mailing.custom_type)
 async def custom_type_chosen(msg: Message, state: FSMContext):
     custom_type = msg.text.lower()
     await state.update_data(custom_type=custom_type)
@@ -55,7 +52,7 @@ async def custom_type_chosen(msg: Message, state: FSMContext):
     await state.set_state(Mailing.mailing_message)
 
 
-@admin_router.message(
+@mailing_router.message(
     Mailing.mailing_type,
     F.text.in_([el.value for el in MailingTypes])
 )
@@ -65,7 +62,7 @@ async def mailing_type_chosen(msg: Message, state: FSMContext):
     if chosen_mailing_type == "заказавшим":
         await msg.answer(
             text="Теперь, пожалуйста, выберите вид закупки:",
-            reply_markup=await make_keyboard(gs_client.get_custom_types_in_work())
+            reply_markup=await make_keyboard(await gs_client.get_custom_types_in_work())
         )
         await state.set_state(Mailing.custom_type)
     else:
@@ -73,7 +70,7 @@ async def mailing_type_chosen(msg: Message, state: FSMContext):
         await state.set_state(Mailing.mailing_message)
 
 
-@admin_router.message(StateFilter(None), Command("message_mailing"))
+@mailing_router.message(StateFilter(None), Command("message_mailing"))
 async def message_mailing_handler(msg: Message, state: FSMContext):
     await msg.answer(
         text="Выберите тип рассылки:",

@@ -3,7 +3,7 @@ import datetime
 import gspread
 import pandas as pd
 
-from bot.Clients.user_storage import UserStorage
+from bot.clients.user_storage import UserStorage
 from config import Config
 
 
@@ -22,10 +22,9 @@ class CustomsClient:
         pass
 
     async def get_custom_types_in_work(self):
-        pass
+        return ['вего']
 
     async def make_start_custom_message(self, custom_type: str, expected_date: str):
-        # todo
         start_custom_message = (
             f"Заказ {custom_type}\n"
             f"Ожидаем {expected_date}\n"
@@ -41,7 +40,7 @@ class CustomsClient:
         new_worksheet = self.client.add_worksheet(
             title=f"{custom_type}_{today}",
             rows=len(df) + 1,
-            cols=len(UserStorage.get_all_users_list())
+            cols=2000
         )
         new_worksheet.update([df.columns.values.tolist()] + df.values.tolist())
 
