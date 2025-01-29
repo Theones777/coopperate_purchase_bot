@@ -3,7 +3,7 @@ from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 
-from bot.Clients.GS import gs_client
+from bot.clients.customs import gs_client
 from bot.handlers.admin.init_handler import admin_router
 from bot.states import Delay
 from bot.texts import DELAY_MESSAGE
@@ -44,14 +44,13 @@ async def expected_date_inserted(msg: Message, state: FSMContext):
         text=f"Вы уверены, что хотите отправить данное сообщение?\n"
              f"Закупка - {custom_type}\n"
              f"Сообщение - {mailing_message}",
-        reply_markup=make_keyboard([el.value for el in ConfirmButtons])
+        reply_markup=await make_keyboard([el.value for el in ConfirmButtons])
     )
     await state.set_state(Delay.confirm)
 
 
 @admin_router.message(
     Delay.custom_type,
-    F.text.in_(gs_client.get_custom_names_in_work())
 )
 async def custom_type_chosen(msg: Message, state: FSMContext):
     custom_type = msg.text.lower()
@@ -59,11 +58,10 @@ async def custom_type_chosen(msg: Message, state: FSMContext):
     await msg.answer(text="Теперь, пожалуйста, введите дату предполагаемой закупки")
     await state.set_state(Delay.expected_date)
 
-
 @admin_router.message(StateFilter(None), Command("delay_custom"))
 async def delay_custom_handler(msg: Message, state: FSMContext):
     await msg.answer(
         text="Выберите вид закупки:",
-        reply_markup=make_keyboard(gs_client.get_custom_names_in_work())
+        reply_markup=await make_keyboard(await gs_client.get_custom_types_in_work())
     )
     await state.set_state(Delay.custom_type)

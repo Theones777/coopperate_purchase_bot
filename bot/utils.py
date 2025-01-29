@@ -29,6 +29,11 @@ async def set_commands(bot: Bot):
     await bot.set_my_commands(commands, BotCommandScopeDefault())
 
 
+async def make_keyboard(items: list[str]) -> ReplyKeyboardMarkup:
+    row = [KeyboardButton(text=item) for item in items]
+    return ReplyKeyboardMarkup(keyboard=[row], resize_keyboard=True)
+
+
 async def mailing(bot: Bot, mailing_type: str, custom_type: str, mailing_message: str, buttons: list = None):
     if mailing_type == MailingTypes.massive.value:
         mailing_list = UserStorage.get_all_users_list()
@@ -40,7 +45,7 @@ async def mailing(bot: Bot, mailing_type: str, custom_type: str, mailing_message
                 await bot.send_message(
                     chat_id=i,
                     text=mailing_message,
-                    reply_markup=make_keyboard(buttons)
+                    reply_markup=await make_keyboard(buttons)
                 )
             else:
                 await bot.send_message(
@@ -50,7 +55,3 @@ async def mailing(bot: Bot, mailing_type: str, custom_type: str, mailing_message
                 )
         except:
             pass
-
-async def make_keyboard(items: list[str]) -> ReplyKeyboardMarkup:
-    row = [KeyboardButton(text=item) for item in items]
-    return ReplyKeyboardMarkup(keyboard=[row], resize_keyboard=True)

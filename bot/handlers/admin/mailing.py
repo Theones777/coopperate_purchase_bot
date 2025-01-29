@@ -3,7 +3,7 @@ from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 
-from bot.Clients.GS import gs_client
+from bot.clients.customs import gs_client
 from bot.handlers.admin.init_handler import admin_router
 from bot.states import Mailing
 from bot.utils import make_keyboard, mailing, MailingTypes, ConfirmButtons
@@ -40,14 +40,13 @@ async def mailing_message_inserted(msg: Message, state: FSMContext):
              f"Тип рассылки - {mailing_type}\n"
              f"Закупка - {custom_type}\n"
              f"Сообщение - {mailing_message}",
-        reply_markup=make_keyboard([el.value for el in ConfirmButtons])
+        reply_markup=await make_keyboard([el.value for el in ConfirmButtons])
     )
     await state.set_state(Mailing.confirm)
 
 
 @admin_router.message(
-    Mailing.custom_type,
-    F.text.in_(gs_client.get_custom_names_in_work())
+    Mailing.custom_type
 )
 async def custom_type_chosen(msg: Message, state: FSMContext):
     custom_type = msg.text.lower()
@@ -66,7 +65,7 @@ async def mailing_type_chosen(msg: Message, state: FSMContext):
     if chosen_mailing_type == "заказавшим":
         await msg.answer(
             text="Теперь, пожалуйста, выберите вид закупки:",
-            reply_markup=make_keyboard(gs_client.get_custom_names_in_work())
+            reply_markup=await make_keyboard(gs_client.get_custom_types_in_work())
         )
         await state.set_state(Mailing.custom_type)
     else:
@@ -78,6 +77,6 @@ async def mailing_type_chosen(msg: Message, state: FSMContext):
 async def message_mailing_handler(msg: Message, state: FSMContext):
     await msg.answer(
         text="Выберите тип рассылки:",
-        reply_markup=make_keyboard([el.value for el in MailingTypes])
+        reply_markup=await make_keyboard([el.value for el in MailingTypes])
     )
     await state.set_state(Mailing.mailing_type)
