@@ -3,7 +3,7 @@ from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 
-from bot.clients.init_clients import gs_client
+from bot.clients.init_clients import gs_client, storage_client
 from bot.states import Ready
 from bot.texts import READY_MESSAGE
 from bot.utils import make_keyboard, mailing, ConfirmButtons, MailingTypes
@@ -22,6 +22,7 @@ async def confirm(msg: Message, state: FSMContext, bot: Bot):
     mailing_type = MailingTypes.specified.value
 
     await mailing(bot, mailing_type, custom_type, mailing_message)
+    await storage_client.delete_custom_type_from_working(custom_type)
     await msg.answer(text=f"Рассылка готовности заказа завершена", reply_markup=ReplyKeyboardRemove())
     await state.clear()
 

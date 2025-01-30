@@ -15,6 +15,11 @@ class User(Model):
 class CustomsWork(Model):
     id = fields.IntField(pk=True)
     custom_type = fields.CharField(max_length=255)
+    user_purchases = fields.JSONField(default=list)
+
+    async def add_user_purchase(self, user_purchase: dict):
+        self.user_purchases.append(user_purchase)
+        await self.save()
 
 
 class Storage:
@@ -29,6 +34,7 @@ class Storage:
             modules={"models": ["__main__"]}
         )
         await Tortoise.generate_schemas()
+        await Tortoise.get_connection("default").execute_script("PRAGMA journal_mode=WAL;")
         logger.info(f"База данных проинициализирована")
 
     @staticmethod
@@ -70,4 +76,17 @@ class Storage:
 
     @staticmethod
     async def get_custom_users_list(custom_type: str) -> list:
-        pass
+        records = await CustomsWork.filter(custom_type=custom_type).values_list("user_purchases", flat=True)
+        return [list(record.keys())[0] for record in records]
+
+    @staticmethod
+    async def save_user_to_working_custom_type(custom_type: str, user_purchase: dict):
+        custom_obj = await CustomsWork.get(custom_type=custom_type)
+        await custom_obj.add_user_purchase(user_purchase)
+
+        logger.info(f"Пользователь {list(user_purchase.keys())[0]} добавлен в закупку {custom_type}")
+
+    @staticmethod
+    async def delete_custom_type_from_working(custom_type: str):
+        await CustomsWork.filter(custom_type=custom_type).delete()
+        logger.info(f"Закупка {custom_type} завершена")
