@@ -3,7 +3,9 @@ import datetime
 import gspread
 import pandas as pd
 
-from bot.clients.user_storage import UserStorage
+from bot.clients.init_clients import storage_client
+from bot.clients.storage import Storage
+from bot.log import logger
 from config import Config
 
 
@@ -18,11 +20,13 @@ class CustomsClient:
             if el.title.startswith(Config.CUSTOM_PRICE_WORKSHEET_PREFIX)]
         return custom_types
 
-    async def add_custom_types_to_work(self, custom_type: str):
-        pass
+    @staticmethod
+    async def add_custom_types_to_work(custom_type: str):
+        await storage_client.save_custom_type_to_work(custom_type)
 
-    async def get_custom_types_in_work(self):
-        return ['вего']
+    @staticmethod
+    async def get_custom_types_in_work():
+        return await storage_client.get_custom_types_in_work()
 
     async def make_start_custom_message(self, custom_type: str, expected_date: str):
         start_custom_message = (
@@ -30,6 +34,7 @@ class CustomsClient:
             f"Ожидаем {expected_date}\n"
             f"Колбасы и цены"
         )
+        logger.info(f"Сообщение для заказа {custom_type} сформировано")
         return start_custom_message
 
     async def make_custom_worksheet(self, custom_type: str):
@@ -43,10 +48,4 @@ class CustomsClient:
             cols=2000
         )
         new_worksheet.update([df.columns.values.tolist()] + df.values.tolist())
-
-
-gs_client = CustomsClient()
-
-if __name__ == "__main__":
-    gs_client = CustomsClient()
-    print(gs_client.make_custom_worksheet("Вего"))
+        logger.info(f"Создана новая страница для заказа {custom_type}")

@@ -1,18 +1,9 @@
-version: "3"
+version: '3.8'
+
 services:
   app:
-    restart: on-failure
-    build:
-      context: .
-    env_file:
-      - .env
-    ports:
-      - "8080:8080"
-    command: [ "python", "main.py" ]
-
-  sqlite:
-    restart: on-failure
-    image: "redis:alpine"
-    command: redis-server --requirepass test
-    ports:
-      - "6379:6379"
+    image: python:3.12
+    volumes:
+      - ./data:/data
+    working_dir: /app
+    command: tail -f /dev/null

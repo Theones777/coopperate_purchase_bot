@@ -10,5 +10,7 @@ class Config:
     ADMIN_IDS = getenv("ADMIN_IDS")
     GS_CONFIG = getenv("GS_CONFIG")
     GS_SHEET_NAME = getenv("GS_SHEET_NAME")
+
+    DB_URL = "sqlite://data/database.db"
     USERS_FILE = "users.txt"
     CUSTOM_PRICE_WORKSHEET_PREFIX = "прайс"

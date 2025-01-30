@@ -3,7 +3,7 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 
-from bot.clients.user_storage import UserStorage
+from bot.clients.init_clients import storage_client
 from bot.texts import START_ADMIN_MESSAGE, START_USER_MESSAGE, HELP_MESSAGE
 from bot.utils import get_admin_ids
 
@@ -15,8 +15,10 @@ async def message_start_handler(msg: Message, state: FSMContext):
     await state.clear()
 
     user_id: int = msg.from_user.id
+    user_full_name: int = msg.from_user.full_name
+    tg_user_name: int = msg.from_user.username
     admin_ids = await get_admin_ids()
-    await UserStorage.save_new_user(user_id)
+    await storage_client.save_new_user(user_id, user_full_name, tg_user_name)
 
     if user_id in admin_ids:
         message = START_ADMIN_MESSAGE
@@ -35,3 +37,5 @@ async def test_handler(msg: Message):
     from pprint import pprint
     pprint(msg)
     await msg.answer(f"Test_handler: {msg.from_user.id}")
+    await msg.answer(f"Test_handler: {msg.from_user.full_name}")
+    await msg.answer(f"Test_handler: {msg.from_user.username}")

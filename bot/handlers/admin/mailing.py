@@ -3,7 +3,7 @@ from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 
-from bot.clients.customs import gs_client
+from bot.clients.init_clients import gs_client
 from bot.states import Mailing
 from bot.utils import make_keyboard, mailing, MailingTypes, ConfirmButtons
 
