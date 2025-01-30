@@ -34,4 +34,4 @@ async def message_help_handler(msg: Message):
 async def test_handler(msg: Message):
     from pprint import pprint
     pprint(msg)
-    await msg.answer(f"Твой ID: {msg.from_user.id}")
+    await msg.answer(f"Test_handler: {msg.from_user.id}")

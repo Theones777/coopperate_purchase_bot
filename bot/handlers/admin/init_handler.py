@@ -19,7 +19,7 @@ admin_router.include_routers(
 admin_router.message.middleware(CheckAccessMiddleware())
 
 
-@admin_router.message(StateFilter(None), Command(commands=["cancel"]))
+@admin_router.message(StateFilter("*"), Command(commands=["cancel"]))
 async def cancel_handler(msg: Message, state: FSMContext):
     await state.set_data({})
     await state.clear()

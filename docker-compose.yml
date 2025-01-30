@@ -1,0 +1,18 @@
+version: "3"
+services:
+  app:
+    restart: on-failure
+    build:
+      context: .
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    command: [ "python", "main.py" ]
+
+  sqlite:
+    restart: on-failure
+    image: "redis:alpine"
+    command: redis-server --requirepass test
+    ports:
+      - "6379:6379"
