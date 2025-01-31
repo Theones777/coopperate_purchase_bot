@@ -7,7 +7,7 @@ from bot.handlers.admin.delay_custom import delay_router
 from bot.handlers.admin.mailing import mailing_router
 from bot.handlers.admin.ready_custom import ready_router
 from bot.handlers.admin.start_custom import start_custom_router
-from bot.middlewares.check_access import CheckAccessMiddleware
+from bot.middlewares.check_admin_access import CheckAdminAccessMiddleware
 
 admin_router = Router()
 admin_router.include_routers(
@@ -16,7 +16,7 @@ admin_router.include_routers(
     ready_router,
     start_custom_router
 )
-admin_router.message.middleware(CheckAccessMiddleware())
+admin_router.message.middleware(CheckAdminAccessMiddleware())
 
 
 @admin_router.message(StateFilter("*"), Command(commands=["cancel"]))

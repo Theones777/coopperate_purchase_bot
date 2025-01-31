@@ -3,9 +3,8 @@ import datetime
 import gspread
 import pandas as pd
 
-from bot.clients.init_clients import storage_client
-from bot.clients.storage import Storage
 from bot.log import logger
+from bot.texts import START_CUSTOM_MESSAGE
 from config import Config
 
 
@@ -20,26 +19,34 @@ class CustomsClient:
             if el.title.startswith(Config.CUSTOM_PRICE_WORKSHEET_PREFIX)]
         return custom_types
 
-    @staticmethod
-    async def add_custom_types_to_work(custom_type: str):
-        await storage_client.save_custom_type_to_work(custom_type)
-
-    @staticmethod
-    async def get_custom_types_in_work():
-        return await storage_client.get_custom_types_in_work()
+    async def make_custom_body(self, custom_type):
+        custom_body = ""
+        worksheet = self.client.worksheet(f"{Config.CUSTOM_PRICE_WORKSHEET_PREFIX}_{custom_type}")
+        df = pd.DataFrame(worksheet.get_all_records())
+        for i in range(len(df)):
+            if df.iloc[i, 2] == "да":
+                custom_body += f"{df.iloc[i, 0]} - {df.iloc[i, 1]} рублей\n"
+        return custom_body
 
     async def make_start_custom_message(self, custom_type: str, expected_date: str):
-        start_custom_message = (
-            f"Заказ {custom_type}\n"
-            f"Ожидаем {expected_date}\n"
-            f"Колбасы и цены"
+        application_date = (datetime.date.today() + datetime.timedelta(days=2)).strftime("%d-%m-%Y")
+        custom_body = await self.make_custom_body(custom_type)
+        start_custom_message = START_CUSTOM_MESSAGE.format(
+            custom_type=custom_type,
+            expected_date=expected_date,
+            application_date=application_date,
+            custom_body=custom_body
         )
-        logger.info(f"Сообщение для заказа {custom_type} сформировано")
+
+        logger.info(f"Сообщение для закупки {custom_type} сформировано")
         return start_custom_message
 
     async def make_custom_worksheet(self, custom_type: str):
         worksheet = self.client.worksheet(f"{Config.CUSTOM_PRICE_WORKSHEET_PREFIX}_{custom_type}")
         df = pd.DataFrame(worksheet.get_all_records())
+        df.drop(columns=Config.AVAILABLE_COLUMN_NAME, inplace=True)
+        df = df.transpose()
+        df["Итого"] = [0 for _ in range(len(df))]
 
         today = datetime.date.today().strftime("%d-%m-%Y")
         new_worksheet = self.client.add_worksheet(

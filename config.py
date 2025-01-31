@@ -14,3 +14,4 @@ class Config:
     DB_URL = "sqlite://data/database.db"
     USERS_FILE = "users.txt"
     CUSTOM_PRICE_WORKSHEET_PREFIX = "прайс"
+    AVAILABLE_COLUMN_NAME = "Есть в закупке"

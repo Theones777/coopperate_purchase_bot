@@ -50,8 +50,8 @@ class Storage:
 
         if created:
             logger.info(f"Новый пользователь {user_full_name} добавлен")
-        else: # todo delete
-            print("Пользователь уже существует")
+        else:
+            logger.info(f"Пользователь {user_full_name} уже существует")
 
     @staticmethod
     async def get_all_users_list() -> list:
@@ -77,11 +77,13 @@ class Storage:
     @staticmethod
     async def get_custom_users_list(custom_type: str) -> list:
         records = await CustomsWork.filter(custom_type=custom_type).values_list("user_purchases", flat=True)
+        await Tortoise.close_connections()
         return [list(record.keys())[0] for record in records]
 
     @staticmethod
     async def save_user_to_working_custom_type(custom_type: str, user_purchase: dict):
         custom_obj = await CustomsWork.get(custom_type=custom_type)
+        await Tortoise.close_connections()
         await custom_obj.add_user_purchase(user_purchase)
 
         logger.info(f"Пользователь {list(user_purchase.keys())[0]} добавлен в закупку {custom_type}")
@@ -89,4 +91,5 @@ class Storage:
     @staticmethod
     async def delete_custom_type_from_working(custom_type: str):
         await CustomsWork.filter(custom_type=custom_type).delete()
+        await Tortoise.close_connections()
         logger.info(f"Закупка {custom_type} завершена")

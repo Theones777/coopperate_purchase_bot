@@ -6,4 +6,4 @@ gs_client = CustomsClient()
 
 # if __name__ == "__main__":
 #     gs_client = CustomsClient()
-#     print(gs_client.make_custom_worksheet("Вего"))
+#     gs_client.make_custom_body("вего")

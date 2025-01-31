@@ -3,7 +3,7 @@ from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 
-from bot.clients.init_clients import gs_client
+from bot.clients.init_clients import storage_client
 from bot.states import Mailing
 from bot.utils import make_keyboard, mailing, MailingTypes, ConfirmButtons
 
@@ -62,7 +62,7 @@ async def mailing_type_chosen(msg: Message, state: FSMContext):
     if chosen_mailing_type == "заказавшим":
         await msg.answer(
             text="Теперь, пожалуйста, выберите вид закупки:",
-            reply_markup=await make_keyboard(await gs_client.get_custom_types_in_work())
+            reply_markup=await make_keyboard(await storage_client.get_custom_types_in_work())
         )
         await state.set_state(Mailing.custom_type)
     else:

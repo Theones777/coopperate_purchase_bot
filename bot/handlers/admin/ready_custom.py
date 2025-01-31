@@ -3,7 +3,7 @@ from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 
-from bot.clients.init_clients import gs_client, storage_client
+from bot.clients.init_clients import storage_client
 from bot.states import Ready
 from bot.texts import READY_MESSAGE
 from bot.utils import make_keyboard, mailing, ConfirmButtons, MailingTypes
@@ -48,6 +48,6 @@ async def custom_type_chosen(msg: Message, state: FSMContext):
 async def ready_custom_handler(msg: Message, state: FSMContext):
     await msg.answer(
         text="Выберите вид закупки:",
-        reply_markup=await make_keyboard(await gs_client.get_custom_types_in_work())
+        reply_markup=await make_keyboard(await storage_client.get_custom_types_in_work())
     )
     await state.set_state(Ready.custom_type)
